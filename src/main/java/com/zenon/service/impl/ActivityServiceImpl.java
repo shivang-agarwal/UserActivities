@@ -3,6 +3,7 @@ package com.zenon.service.impl;
 import com.zenon.dto.ActivityDto;
 import com.zenon.exception.ActivityNotFoundException;
 import com.zenon.mapper.ActivityMapper;
+import com.zenon.model.User;
 import com.zenon.repository.ActivityRepository;
 import com.zenon.service.ActivityService;
 import com.zenon.service.UserService;
@@ -26,12 +27,12 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
     @Override
-    public Set<ActivityDto> list(Pageable pageable) {
+    public Set<ActivityDto> list(Pageable pageable, User user) {
         if(Objects.isNull(pageable)) {
             pageable = PageRequest.of(0, 10, Sort.Direction.ASC, "targetDate");
         }
         return activityRepository
-                .findAllByIsDeleted(pageable,false)
+                .findAllByIsDeletedAndUser(pageable,false, user)
                 .stream()
                 .map(ActivityMapper::activityDto)
                 .collect(Collectors.toSet());
@@ -45,15 +46,15 @@ public class ActivityServiceImpl implements ActivityService {
     @Override
     public ActivityDto update(ActivityDto activityDto) {
         return activityRepository
-                .findById(activityDto.getId())
+                .findByIdAndUser(activityDto.getId(), activityDto.getUser())
                 .map( activity -> ActivityMapper.activityDto(activityRepository.save(ActivityMapper.dtoActivity(activity, activityDto))))
                 .orElseThrow(() -> new ActivityNotFoundException(activityDto.getId()));
     }
 
 
     @Override
-    public void delete(String id) {
-        activityRepository.findById(id)
+    public void delete(String id, User user) {
+        activityRepository.findByIdAndUser(id, user)
         .map(activity -> {
             activity.setIsDeleted(true);
             return activityRepository.save(activity);

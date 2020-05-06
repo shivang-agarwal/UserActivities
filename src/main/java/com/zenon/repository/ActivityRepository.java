@@ -1,6 +1,7 @@
 package com.zenon.repository;
 
 import com.zenon.model.Activity;
+import com.zenon.model.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -8,10 +9,13 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ActivityRepository extends JpaRepository<Activity, String> {
 
-//    @Query("from Activity where isDeleted = ?1")
-    public Page<Activity> findAllByIsDeleted(Pageable pageable, boolean isDeleted);
+    public Page<Activity> findAllByIsDeletedAndUser(Pageable pageable, boolean isDeleted, User user);
+
+    public Optional<Activity> findByIdAndUser(String id, User user);
+
 }

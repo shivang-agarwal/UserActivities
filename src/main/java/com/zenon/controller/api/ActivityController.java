@@ -68,8 +68,8 @@ public class ActivityController {
     public ResponseEntity delete(@PathVariable("activityId") String id,
                                  @RequestHeader(required = true) String username,
                                  @RequestHeader(required = true) String password){
-        authenticate(username, password);
-        activityService.delete(id);
+        User user = authenticate(username, password);
+        activityService.delete(id, user);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
@@ -78,9 +78,9 @@ public class ActivityController {
                                                      @SortDefault.SortDefaults(@SortDefault(sort = "targetDate", direction = Sort.Direction.ASC)) Pageable pageable,
             @RequestHeader(required = true) String username,
             @RequestHeader(required = true) String password) {
-        authenticate(username, password);
+        User user = authenticate(username, password);
         return new ResponseEntity<Set<ActivityDto>>(
-                activityService.list(pageable),
+                activityService.list(pageable, user),
                 HttpStatus.OK
         );
     }
